@@ -46,6 +46,35 @@ func (s *Server) insertObject(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+func (s *Server) copyObject(w http.ResponseWriter, r *http.Request) {
+	encoder := json.NewEncoder(w)
+
+	bucket1 := mux.Vars(r)["bucketName1"]
+	bucket2 := mux.Vars(r)["bucketName2"]
+
+	obj1 := mux.Vars(r)["obj1"]
+	obj2 := mux.Vars(r)["obj2"]
+
+	data, err := s.GetObject(bucket1, obj1)
+	if err != nil {
+		errResp := newErrorResponse(http.StatusNotFound, "Not Found", nil)
+		w.WriteHeader(http.StatusNotFound)
+		encoder.Encode(errResp)
+		return
+	}
+
+	s.CreateObject(Object{
+		Name:       obj2,
+		BucketName: bucket2,
+		Content:    data.Content,
+	})
+
+	w.WriteHeader(200)
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"done": true,
+	})
+}
+
 func (s *Server) simpleUpload(bucketName string, w http.ResponseWriter, r *http.Request) {
 	defer r.Body.Close()
 	name := r.URL.Query().Get("name")

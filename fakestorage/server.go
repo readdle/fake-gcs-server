@@ -56,6 +56,7 @@ func (s *Server) buildMuxer() {
 	r.Path("/b/{bucketName}").Methods("GET").HandlerFunc(s.getBucket)
 	r.Path("/b/{bucketName}/o").Methods("GET").HandlerFunc(s.listObjects)
 	r.Path("/b/{bucketName}/o").Methods("POST").HandlerFunc(s.insertObject)
+	r.Path("/b/{bucketName1}/o/{obj1:.+}/rewriteTo/b/{bucketName2}/o/{obj2:.+}").Methods("POST").HandlerFunc(s.copyObject)
 	r.Path("/b/{bucketName}/o/{objectName:.+}").Methods("GET").HandlerFunc(s.getObject)
 	s.mux.Path("/upload/storage/v1/b/{bucketName}/o").Methods("POST").HandlerFunc(s.insertObject)
 	s.mux.Path("/upload/resumable/{uploadId}").Methods("PUT", "POST").HandlerFunc(s.uploadFileContent)
